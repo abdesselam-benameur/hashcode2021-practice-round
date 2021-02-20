@@ -1,4 +1,4 @@
 - créer deux tableaux: le 1er contient les pizzas ordonnées selon un ordre criossant et le 2eme dércoissant
-	puis livrer la pizza du tab1[i] avec tab2[i]
-- ordonner les pizzas selon un ordre croissant puis faire des livraisons de 2 puis 3 puis
-- pour chaque pizza, on cherche the best match pour cette pizza ensuite on refait ça jusqu'a former une livraison de 4 puis 3 puis 2
+	puis livrer la pizza du tab1[i] avec tab2[i] (me)
+- ordonner les pizzas selon un ordre croissant puis faire des livraisons de 2 puis 3 puis (me)
+- pour chaque pizza, on cherche the best match pour cette pizza ensuite on refait ça jusqu'a former une livraison de 4 puis 3 puis 2 (sari)
