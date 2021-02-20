@@ -4,21 +4,23 @@ import random
 import os
 
 names = [
-    "a_example",
-    "b_little_bit_of_everything",
-    "c_many_ingredients",
+    # "a_example",
+    # "b_little_bit_of_everything",
+    # "c_many_ingredients",
     "d_many_pizzas",
-    "e_many_teams",
+    # "e_many_teams",
 ]
 
-numberOfIterations = 10
+scoreTotal = 0
+numberOfIterations = 1
 step = int(numberOfIterations * 0.1)
+if step == 0:
+    step = 1
 
 for name in names:
     if name not in os.listdir("drafts"):
         os.mkdir("drafts/"+name)
- 
-# nameOfFile = names[1]
+
 for nameOfFile in names:
     start_time = time.time()
     with open("{}.in".format(nameOfFile)) as file:
@@ -32,6 +34,8 @@ for nameOfFile in names:
             numberOfIngredients = int(line[0])
             ingredients = line[1:]
             pizzas.append(ingredients)
+        
+        pizzasSorted = sorted(enumerate(pizzas), key=lambda e: len(e[1]))
  
     try:
         bestScore = int(
@@ -46,21 +50,21 @@ for nameOfFile in names:
         if i == values[0]:
             values.pop(0)
             print("iteration {}".format(i))
+        b = 0
         teamsCopy = teams.copy()
         N = M
-        pizzasIndices = list(range(N))
+        # pizzasIndices = list(range(N))
         score = 0
         deliveries = []
         choices = [2, 3, 4]
         cpt = 0
         while True:
-            r = random.choice(choices)  # the number of members of the team
-            # r = choices[-1]
+            # r = random.choice(choices)  # the number of members of the team
+            r = choices[-1]
             if teamsCopy[r] > 0:
                 teamsCopy[r] -= 1
             else:
                 choices.remove(r)
-                # choices.pop()
                 if len(choices) == 0:
                     break
                 continue
@@ -69,10 +73,9 @@ for nameOfFile in names:
             delivery = [r]
             deliveryIngredients = set()
             for _ in range(r):
-                b = random.choice(pizzasIndices)
-                pizzasIndices.remove(b)
-                delivery.append(b)
-                deliveryIngredients.update(pizzas[b])
+                delivery.append(pizzasSorted[b][0])
+                deliveryIngredients.update(pizzasSorted[b][1])
+                b += 1
             deliveries.append(delivery)
             score += len(deliveryIngredients)**2
  
@@ -86,10 +89,9 @@ for nameOfFile in names:
                 delivery = [N]
                 deliveryIngredients = set()
                 for _ in range(N):
-                    b = random.choice(pizzasIndices)
-                    pizzasIndices.remove(b)
-                    delivery.append(b)
-                    deliveryIngredients.update(pizzas[b])
+                    delivery.append(pizzasSorted[b][0])
+                    deliveryIngredients.update(pizzasSorted[b][1])
+                    b += 1
                 deliveries.append(delivery)
                 score += len(deliveryIngredients)**2
                 break
@@ -111,3 +113,7 @@ for nameOfFile in names:
  
     print("best score after {} iterations ({}) =".format(numberOfIterations, nameOfFile), bestScore)
     print("---- %s seconds ----" % (time.time() - start_time))
+    scoreTotal += bestScore
+
+
+print("\n<<<<<<<<<<<<<<<<<< score total =", scoreTotal, ">>>>>>>>>>>>>>>>>>>>>>\n")
