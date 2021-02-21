@@ -1,0 +1,5 @@
+Number of ingredients in a_example without duplicates: 7
+Number of ingredients in b_little_bit_of_everything without duplicates: 10
+Number of ingredients in c_many_ingredients without duplicates: 10000
+Number of ingredients in d_many_pizzas without duplicates: 100
+Number of ingredients in e_many_teams without duplicates: 100
