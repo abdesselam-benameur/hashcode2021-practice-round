@@ -53,7 +53,7 @@ for nameOfFile in names:
         b = 0
         teamsCopy = teams.copy()
         N = M
-        # pizzasIndices = list(range(N))
+        pizzasIndices = list(range(N))
         score = 0
         deliveries = []
         choices = [2, 3, 4]
@@ -71,11 +71,30 @@ for nameOfFile in names:
  
             cpt += 1
             delivery = [r]
-            deliveryIngredients = set()
-            for _ in range(r):
-                delivery.append(pizzasSorted[b][0])
-                deliveryIngredients.update(pizzasSorted[b][1])
-                b += 1
+            deliveryIngredients = set(pizzasSorted[b][1])
+            for _ in range(r-1):
+                oldScore = len(deliveryIngredients)
+                deliveryIngredientsCopy1 = deliveryIngredients.copy()
+                deliveryIngredientsCopy1.update(pizzasSorted[b][1]) # next in the list
+                newScore1 = len(deliveryIngredientsCopy1)
+
+                indice = random.choice(pizzasIndices) # random choice
+                deliveryIngredientsCopy2 = deliveryIngredients.copy()
+                deliveryIngredientsCopy2.update(pizzasSorted[indice][1])
+                newScore2 = len(deliveryIngredientsCopy2)
+
+                if newScore1 > newScore2:
+                    deliveryIngredients = deliveryIngredientsCopy1
+                    pizzasIndices.remove(b)
+                    delivery.append(pizzasSorted[b][0])
+                    deliveryIngredients.update(pizzasSorted[b][1])
+                    b += 1
+                else:
+                    deliveryIngredients = deliveryIngredientsCopy2
+                    pizzasIndices.remove(indice)
+                    delivery.append(pizzasSorted[indice][0])
+                    deliveryIngredients.update(pizzasSorted[indice][1])
+
             deliveries.append(delivery)
             score += len(deliveryIngredients)**2
  
