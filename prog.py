@@ -5,14 +5,14 @@ import os
 
 names = [
     # "a_example",
-    # "b_little_bit_of_everything",
-    # "c_many_ingredients",
+    "b_little_bit_of_everything",
+    "c_many_ingredients",
     "d_many_pizzas",
-    # "e_many_teams",
+    "e_many_teams",
 ]
 
 scoreTotal = 0
-numberOfIterations = 1
+numberOfIterations = 10
 step = int(numberOfIterations * 0.1)
 if step == 0:
     step = 1
@@ -22,7 +22,6 @@ for name in names:
         os.mkdir("drafts/"+name)
 
 for nameOfFile in names:
-    start_time = time.time()
     with open("{}.in".format(nameOfFile)) as file:
         firstLine = list(map(int, file.readline().strip().split(" ")))
         M = firstLine[0]  # number of pizzas
@@ -35,11 +34,11 @@ for nameOfFile in names:
             ingredients = line[1:]
             pizzas.append(ingredients)
         
-        pizzasSorted = sorted(enumerate(pizzas), key=lambda e: len(e[1]))
+        pizzasSorted = sorted(enumerate(pizzas), key=lambda e: len(e[1]), reverse=True)
  
     try:
         bestScore = int(
-            os.listdir("drafts/{}".format(nameOfFile))[0].split(" ")[1][:-4])
+            sorted(os.listdir("drafts/{}".format(nameOfFile)))[-1].split(" ")[1][:-4])
     except IndexError:
         bestScore = 0
 
@@ -47,6 +46,13 @@ for nameOfFile in names:
     values.append(numberOfIterations)
 
     for i in range(numberOfIterations):
+        # try:
+        #     bestScore = int(
+        #         sorted(os.listdir("drafts/{}".format(nameOfFile)))[-1].split(" ")[1][:-4])
+        # except IndexError:
+        #     bestScore = 0
+        start_time = time.time()
+        pizzasSortedCopy = pizzasSorted.copy()
         if i == values[0]:
             values.pop(0)
             print("iteration {}".format(i))
@@ -58,6 +64,7 @@ for nameOfFile in names:
         deliveries = []
         choices = [2, 3, 4]
         cpt = 0
+        
         while True:
             # r = random.choice(choices)  # the number of members of the team
             r = choices[-1]
@@ -68,54 +75,71 @@ for nameOfFile in names:
                 if len(choices) == 0:
                     break
                 continue
- 
-            cpt += 1
-            delivery = [r]
-            deliveryIngredients = set(pizzasSorted[b][1])
-            for _ in range(r-1):
-                oldScore = len(deliveryIngredients)
+
+            delivery = [r, pizzasSortedCopy[b][0]]
+            deliveryIngredients = set(pizzasSortedCopy[b][1])
+            # TODO: transform the next line to this: pizzasIndices.pop(0)
+            # pizzasIndices.pop(0)
+            pizzasSortedCopy.pop(0)
+
+            for _ in range(1, r):
+                # oldScore = len(deliveryIngredients)
                 deliveryIngredientsCopy1 = deliveryIngredients.copy()
-                deliveryIngredientsCopy1.update(pizzasSorted[b][1]) # next in the list
+                deliveryIngredientsCopy1.update(pizzasSortedCopy[0][1])  # the next pizza in the list
                 newScore1 = len(deliveryIngredientsCopy1)
 
-                indice = random.choice(pizzasIndices) # random choice
+                pizza = random.choice(pizzasSortedCopy[1:])  # a random pizza in pizzaSorted[1:]
                 deliveryIngredientsCopy2 = deliveryIngredients.copy()
-                deliveryIngredientsCopy2.update(pizzasSorted[indice][1])
+                deliveryIngredientsCopy2.update(pizza[1])
                 newScore2 = len(deliveryIngredientsCopy2)
 
-                if newScore1 > newScore2:
+                if newScore1 >= newScore2:
                     deliveryIngredients = deliveryIngredientsCopy1
-                    pizzasIndices.remove(b)
-                    delivery.append(pizzasSorted[b][0])
-                    deliveryIngredients.update(pizzasSorted[b][1])
-                    b += 1
+                    # TODO: transform the next line to this: pizzasIndices.pop(0)
+                    delivery.append(pizzasSortedCopy[0][0])
+                    deliveryIngredients.update(pizzasSortedCopy[0][1])
+                    # pizzasIndices.pop(0)
+                    pizzasSortedCopy.pop(0)
+                    # b += 1
                 else:
                     deliveryIngredients = deliveryIngredientsCopy2
-                    pizzasIndices.remove(indice)
-                    delivery.append(pizzasSorted[indice][0])
-                    deliveryIngredients.update(pizzasSorted[indice][1])
+                    delivery.append(pizza[0])
+                    deliveryIngredients.update(pizza[1])
+                    # pizzasIndices.remove(pizza[0])
+                    pizzasSortedCopy.remove(pizza)
 
             deliveries.append(delivery)
+            cpt += 1
+            # if cpt == value:
+            #     print("I have done {} deliveries so far".format(cpt))
             score += len(deliveryIngredients)**2
- 
+
             N -= r
- 
+
             if N <= 1:
                 break
- 
+
             if N <= 4:
-                cpt += 1
-                delivery = [N]
-                deliveryIngredients = set()
-                for _ in range(N):
-                    delivery.append(pizzasSorted[b][0])
-                    deliveryIngredients.update(pizzasSorted[b][1])
-                    b += 1
-                deliveries.append(delivery)
-                score += len(deliveryIngredients)**2
+                while N >= 2:
+                    if teamsCopy[N] > 0:
+                        delivery = [N]
+                        deliveryIngredients = set()
+                        for _ in range(N):
+                            delivery.append(pizzasSortedCopy[b][0])
+                            deliveryIngredients.update(pizzasSortedCopy[b][1])
+                            b += 1
+                        deliveries.append(delivery)
+                        cpt += 1
+                        score += len(deliveryIngredients)**2
+                        break
+                    else:
+                        N -= 1
                 break
- 
+
+        # print("I have done {} deliveries so far with score = {}".format(cpt, score))
         if score > bestScore:
+            print("{} new best score = {} previous best score = {}".format(nameOfFile, score, bestScore), "---- %s seconds ----" % (time.time() - start_time))
+            print("############################## new best score ##############################")
             bestScore = score
             try:
                 os.remove("drafts/{}/{}".format(
@@ -124,15 +148,14 @@ for nameOfFile in names:
             except IndexError:
                 pass
             with open("drafts/{0}/{0} {1}.txt".format(nameOfFile, score), "w") as file:
-                print(cpt, file=file)
+                print(len(deliveries), file=file)
                 for delivery in deliveries:
                     print(*delivery, sep=" ", file=file)
                 # delete the last newline
                 file.truncate(file.tell() - len(os.linesep))
  
-    print("best score after {} iterations ({}) =".format(numberOfIterations, nameOfFile), bestScore)
     print("---- %s seconds ----" % (time.time() - start_time))
-    scoreTotal += bestScore
+    # scoreTotal += score
 
 
-print("\n<<<<<<<<<<<<<<<<<< score total =", scoreTotal, ">>>>>>>>>>>>>>>>>>>>>>\n")
+# print("\n<<<<<<<<<<<<<<<<<< score total =", scoreTotal, ">>>>>>>>>>>>>>>>>>>>>>\n")

@@ -1,0 +1,1 @@
+- represent the dataset matrices as images 0s are red pixels and 1s are green pixels for example (this concerns solution 2)
