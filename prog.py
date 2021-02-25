@@ -78,8 +78,6 @@ for nameOfFile in names:
 
             delivery = [r, pizzasSortedCopy[b][0]]
             deliveryIngredients = set(pizzasSortedCopy[b][1])
-            # TODO: transform the next line to this: pizzasIndices.pop(0)
-            # pizzasIndices.pop(0)
             pizzasSortedCopy.pop(0)
 
             for _ in range(1, r):
@@ -95,7 +93,6 @@ for nameOfFile in names:
 
                 if newScore1 >= newScore2:
                     deliveryIngredients = deliveryIngredientsCopy1
-                    # TODO: transform the next line to this: pizzasIndices.pop(0)
                     delivery.append(pizzasSortedCopy[0][0])
                     deliveryIngredients.update(pizzasSortedCopy[0][1])
                     # pizzasIndices.pop(0)
